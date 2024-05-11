@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediction Models</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="hamburger-menu" onclick="toggleSidebar()">&#9776;</div>
+      <div class="sidebar left-sidebar" id="left-sidebar">
+        <h2>Prediction Models</h2>
+        <nav>
+          <ul>
+            <li><a href="#">Disease Classification</a></li>
+            <li><a href="#">Text Classification</a></li>
+          </ul>
+        </nav>
+        <footer>
+          <p>Designed by Ishan</p>
+        </footer>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content" id="main-content">
+        <div id="selected-image-container">
+          <!-- Selected image will be displayed here -->
+          <img
+            id="selected-image"
+            src=""
+            alt="Selected Image"
+            style="display: none"
+          />
+        </div>
+
+        <!-- New element for displaying classification results -->
+        <div id="classification-result-box">
+          <h3>Classification Result:</h3>
+          <div id="classification-result">
+            <!-- Classification result will be displayed here -->
+          </div>
+        </div>
+
+        <!-- Button to trigger file input dialog -->
+        <button
+          class="upload-btn"
+          onclick="document.getElementById('file-input').click()"
+        >
+          Upload
+        </button>
+
+        <!-- File input element for uploading images -->
+        <input
+          type="file"
+          id="file-input"
+          accept="image/*"
+          style="display: none"
+          onchange="uploadImage(event)"
+        />
+
+        <button class="classify-btn" onclick="classifyImage()">Classify</button>
+      </div>
+
+      <div class="sidebar right-sidebar" id="right-sidebar">
+        <!-- Right Sidebar Content -->
+        <h2>Images</h2>
+        <div class="images-container" id="images-container">
+          <!-- Images will be dynamically loaded here -->
+        </div>
+        <div class="dropdown">
+          <button class="dropbtn disease-btn" onclick="toggleDiseaseMenu()">
+            Disease
+          </button>
+          <button class="dropbtn model-btn" onclick="toggleModelMenu()">
+            Model
+          </button>
+          <div class="dropdown-content" id="disease-menu">
+            <a href="#" onclick="selectDisease('Brain Tumor')">Brain Tumor</a>
+            <a href="#" onclick="selectDisease('Skin Cancer')">Skin Cancer</a>
+            <a href="#" onclick="selectDisease('Chest Cancer')">Chest Cancer</a>
+          </div>
+          <div class="dropdown-content" id="model-menu">
+            <!-- Models will be dynamically loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Variable to store the selected image path
+      var selectedImagePath = "";
+      // Variable to store the selected disease
+      var selectedDisease = "";
+
+      // Function to handle file selection and upload
+      function uploadImage(event) {
+        // Get the selected file
+        var file = event.target.files[0];
+
+        // Create a FormData object
+        var formData = new FormData();
+
+        // Append the file to the FormData object
+        formData.append("file", file);
+
+        // Send a POST request to the server with the FormData object
+        fetch("/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            // Display a message indicating the image was uploaded successfully
+            alert("Image uploaded successfully!");
+
+            // Set the selected image path to the uploaded file path
+            selectedImagePath = data.filename;
+
+            // Display the selected image on the main screen
+            var selectedImageContainer = document.getElementById(
+              "selected-image-container"
+            );
+            selectedImageContainer.innerHTML = `<img src="${data.filename}" alt="Selected Image" width="auto" height="500">`;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            // Display an error message if the upload fails
+            alert("An error occurred while uploading the image.");
+          });
+      }
+
+      // Function to handle the click event when the "Classify" button is clicked
+      function classifyImage() {
+        if (!selectedImagePath) {
+          alert("No image selected!");
+          return;
+        }
+
+        // Send the local file path of the selected image and selected disease to the server for classification
+        fetch("/classify", {
+          method: "POST",
+          body: JSON.stringify({
+            image_path: selectedImagePath,
+            disease: selectedDisease,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Display the classification result in the result box
+            var classificationResultBox = document.getElementById(
+              "classification-result-box"
+            );
+            var classificationResult = document.getElementById(
+              "classification-result"
+            );
+            classificationResult.innerHTML = `<p>${data.result}</p>`;
+            classificationResultBox.style.display = "block"; // Show the result box
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while classifying the image.");
+          });
+      }
+
+      // Function to toggle the model menu
+      function toggleModelMenu() {
+        var modelMenu = document.getElementById("model-menu");
+        modelMenu.classList.toggle("show");
+
+        // Get the button position
+        var button = document.querySelector(".model-btn");
+        var buttonRect = button.getBoundingClientRect();
+
+        // Position the model menu above the button
+        modelMenu.style.bottom = window.innerHeight - buttonRect.top + "px";
+        modelMenu.style.left = buttonRect.left + "px";
+      }
+      /*
+      // Function to handle the click event when an image is selected
+      function selectImage(imagePath) {
+        // Your code to handle the selected image goes here
+        // For example, you can display the selected image in a larger view
+        var selectedImageContainer = document.getElementById(
+          "selected-image-container"
+        );
+        selectedImageContainer.innerHTML = `<img src="${imagePath}" alt="Selected Image">`;
+      }
+
+      //--------------------------------------------------
+      // Function to load and display images from a folder
+      function loadImages(disease) {
+        var imagesContainer = document.getElementById("images-container");
+        var imagePath = "";
+
+        // Set the image path based on the selected disease
+        switch (disease) {
+          case "Brain Tumor":
+            imagePath = "{{ url_for('static', filename='combined_dataset/') }}";
+            break;
+          case "Chest Cancer":
+            imagePath = "{{ url_for('static', filename='chest_data/') }}";
+            break;
+          // Add more cases for other diseases as needed
+          default:
+            imagePath = "{{ url_for('static', filename='combined_dataset/') }}";
+        }
+
+        // Clear existing images
+        imagesContainer.innerHTML = "";
+
+        // Iterate through each image in the folder
+        for (var i = 1; i <= totalImages; i++) {
+          var img = document.createElement("img");
+          img.src = `${imagePath}${i}.jpg`; // Assuming the images are named sequentially
+          img.onclick = function () {
+            selectImage(img.src);
+          };
+          imagesContainer.appendChild(img);
+        }
+      }
+
+      // Set the total number of images
+      var totalImages = 6; // Total number of images
+      
+      */
+      //--------------------------------------------------
+
+      // Function to select a disease
+      function selectDisease(disease) {
+        // Set the selected disease
+        selectedDisease = disease;
+        //loadImages(disease);
+
+        // Here you can load models based on the selected disease
+        var modelMenu = document.getElementById("model-menu");
+        modelMenu.innerHTML = ""; // Clear existing models
+
+        // Load models dynamically based on the selected disease
+        switch (disease) {
+          case "Brain Tumor":
+            modelMenu.innerHTML += `<a href="#" onclick="selectModel('EfficientNet')">EfficientNet</a>`;
+            break;
+          case "Chest Cancer":
+            modelMenu.innerHTML += `<a href="#" onclick="selectModel('EfficientNet')">EfficientNet</a>`;
+            break;
+          default:
+            modelMenu.innerHTML += `<a href="#">Model 1</a>`;
+            modelMenu.innerHTML += `<a href="#">Model 2</a>`;
+            break;
+        }
+        // Close the model menu after selecting
+        toggleModelMenu();
+      }
+
+      // Function to select a model
+      function selectModel(model) {
+        alert("Selected Model: " + model);
+        // Add your logic to handle the selected model
+      }
+
+      // Function to toggle the disease menu
+      function toggleDiseaseMenu() {
+        var diseaseMenu = document.getElementById("disease-menu");
+        diseaseMenu.classList.toggle("show");
+
+        // Get the button position
+        var button = document.querySelector(".disease-btn");
+        var buttonRect = button.getBoundingClientRect();
+
+        // Position the disease menu above the button
+        diseaseMenu.style.bottom = window.innerHeight - buttonRect.top + "px";
+        diseaseMenu.style.left = buttonRect.left + "px";
+      }
+
+      // Function to toggle the left sidebar
+      function toggleSidebar() {
+        var sidebar = document.getElementById("left-sidebar");
+        sidebar.classList.toggle("active");
+      }
+
+      // Close the dropdown menu if the user clicks outside of it
+      window.onclick = function (event) {
+        if (!event.target.matches(".dropbtn")) {
+          var dropdowns = document.getElementsByClassName("dropdown-content");
+          var i;
+          for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains("show")) {
+              openDropdown.classList.remove("show");
+            }
+          }
+        }
+      };
+    </script>
+  </body>
+</html>

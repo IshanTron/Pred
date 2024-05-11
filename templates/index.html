@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload and Display Image</title>
+    <!-- Include CSS if needed -->
+  </head>
+  <body>
+    <h1>Upload and Display Image</h1>
+
+    <!-- Form to upload image -->
+    <form id="upload-form" enctype="multipart/form-data">
+      <input type="file" name="file" id="file-input" accept="image/*" />
+      <button type="button" onclick="uploadImage()">Upload Image</button>
+    </form>
+
+    <!-- Container to display uploaded image -->
+    <div id="image-container"></div>
+
+    <!-- Include JavaScript for functionality -->
+    <script>
+      // Function to handle image upload
+      function uploadImage() {
+        var formData = new FormData();
+        var fileInput = document.getElementById("file-input");
+        formData.append("file", fileInput.files[0]);
+
+        fetch("/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              alert(data.error);
+            } else {
+              displayImage(data.filename);
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Function to display uploaded image
+      function displayImage(filename) {
+        var imageContainer = document.getElementById("image-container");
+        imageContainer.innerHTML = `<img src="${filename}" alt="Uploaded Image" style="max-width: 100%;">`;
+      }
+    </script>
+  </body>
+</html>

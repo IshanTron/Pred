@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediction Models</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="hamburger-menu" onclick="toggleSidebar()">&#9776;</div>
+      <div class="sidebar left-sidebar" id="left-sidebar">
+        <h2>Prediction Models</h2>
+        <nav>
+          <ul>
+            <li><a href="#">Disease Classification</a></li>
+            <li><a href="#">Text Classification</a></li>
+          </ul>
+        </nav>
+        <footer>
+          <a href="#">Publishing Notes</a>
+          <a href="#">Data Protection Policy</a>
+        </footer>
+      </div>
+
+      <!-- Main Content -->
+      <div class="content" id="main-content">
+        <div id="selected-image-container">
+          <!-- Selected image will be displayed here -->
+        </div>
+        <div id="classification-result">
+          <!-- Classification result will be displayed here -->
+        </div>
+      </div>
+
+      <div class="sidebar right-sidebar" id="right-sidebar">
+        <!-- Right Sidebar Content -->
+        <h2>Images</h2>
+        <div class="images-container" id="images-container">
+          <!-- Images will be dynamically loaded here -->
+        </div>
+        <div class="dropdown">
+          <button class="dropbtn disease-btn" onclick="toggleDiseaseMenu()">
+            Disease
+          </button>
+          <button class="dropbtn model-btn" onclick="toggleModelMenu()">
+            Model
+          </button>
+          <div class="dropdown-content" id="disease-menu">
+            <a href="#" onclick="selectDisease('Disease 1')">Brain Tumor</a>
+            <a href="#" onclick="selectDisease('Disease 2')">Skin Cancer</a>
+            <a href="#" onclick="selectDisease('Disease 3')">Disease 3</a>
+            <a href="#" onclick="selectDisease('Disease 4')">Disease 4</a>
+          </div>
+          <div class="dropdown-content" id="model-menu">
+            <!-- Models will be dynamically loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="upload-btn" onclick="uploadImage()">Upload</button>
+
+    <button class="classify-btn" onclick="classifyImage()">Classify</button>
+
+    <script>
+      // Variable to store the selected image path
+      var selectedImagePath = "";
+
+      // Function to handle the click event when an image is selected on the right sidebar
+      function selectImage(imagePath) {
+        selectedImagePath = imagePath;
+        var selectedImageContainer = document.getElementById(
+          "selected-image-container"
+        );
+        selectedImageContainer.innerHTML = `<img src="${imagePath}" alt="Selected Image">`;
+      }
+
+      // Function to handle the click event when the "Classify" button is clicked
+      function classifyImage() {
+        if (!selectedImagePath) {
+          alert("No image selected!");
+          return;
+        }
+
+        // Send the local file path of the selected image to the server for classification
+        fetch("/classify", {
+          method: "POST",
+          body: JSON.stringify({ image_path: selectedImagePath }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Display the classification result on the main content screen
+            var classificationResultContainer = document.getElementById(
+              "classification-result"
+            );
+            classificationResultContainer.innerHTML = `<p>${data.result}</p>`;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while classifying the image.");
+          });
+      }
+
+      // Function to toggle the model menu
+      function toggleModelMenu() {
+        var modelMenu = document.getElementById("model-menu");
+        modelMenu.classList.toggle("show");
+
+        // Get the button position
+        var button = document.querySelector(".model-btn");
+        var buttonRect = button.getBoundingClientRect();
+
+        // Position the model menu above the button
+        modelMenu.style.bottom = window.innerHeight - buttonRect.top + "px";
+        modelMenu.style.left = buttonRect.left + "px";
+      }
+
+      // Function to select a disease
+      function selectDisease(disease) {
+        // Here you can load models based on the selected disease
+        var modelMenu = document.getElementById("model-menu");
+        modelMenu.innerHTML = ""; // Clear existing models
+
+        // Load models dynamically based on the selected disease
+        switch (disease) {
+          case "Disease 1":
+            modelMenu.innerHTML += `<a href="#" onclick="selectModel('EfficientNet')">EfficientNet</a>`;
+            break;
+          default:
+            modelMenu.innerHTML += `<a href="#">Model 1</a>`;
+            modelMenu.innerHTML += `<a href="#">Model 2</a>`;
+            break;
+        }
+        // Close the model menu after selecting
+        toggleModelMenu();
+      }
+
+      // Function to select a model
+      function selectModel(model) {
+        alert("Selected Model: " + model);
+        // Add your logic to handle the selected model
+      }
+
+      // Function to toggle the left sidebar
+      function toggleSidebar() {
+        var sidebar = document.getElementById("left-sidebar");
+        sidebar.classList.toggle("active");
+      }
+
+      // Function to toggle the disease menu
+      function toggleDiseaseMenu() {
+        var diseaseMenu = document.getElementById("disease-menu");
+        diseaseMenu.classList.toggle("show");
+
+        // Get the button position
+        var button = document.querySelector(".disease-btn");
+        var buttonRect = button.getBoundingClientRect();
+
+        // Position the disease menu above the button
+        diseaseMenu.style.bottom = window.innerHeight - buttonRect.top + "px";
+        diseaseMenu.style.left = buttonRect.left + "px";
+      }
+
+      // Close the dropdown menu if the user clicks outside of it
+      window.onclick = function (event) {
+        if (!event.target.matches(".dropbtn")) {
+          var dropdowns = document.getElementsByClassName("dropdown-content");
+          var i;
+          for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains("show")) {
+              openDropdown.classList.remove("show");
+            }
+          }
+        }
+      };
+
+      /*     
+      // Function to load and display images in batches
+      function loadImagesInBatches(startIndex, batchSize) {
+        var imagesContainer = document.getElementById("images-container");
+        var imagePath = "{{ url_for('static', filename='combined_dataset/') }}";
+        var imageFiles = [];
+
+        // Define the range of images to load
+        for (var i = startIndex; i < startIndex + batchSize; i++) {
+          imageFiles.push(i + ".jpg"); // Adjust the file extension if needed
+        }
+
+        // Iterate through each image filename
+        imageFiles.forEach(function (filename) {
+          var img = document.createElement("img");
+          img.src = imagePath + filename;
+          img.onclick = function () {
+            selectImage(imagePath + filename);
+          };
+          imagesContainer.appendChild(img);
+        });
+
+        // Check if there are more images to load
+        if (startIndex + batchSize < totalImages) {
+          // Load the next batch after a delay
+          setTimeout(function () {
+            loadImagesInBatches(startIndex + batchSize, batchSize);
+          }, 100); // Adjust the delay time as needed
+        }
+      }
+
+      // Set the total number of images and batch size
+      var totalImages = 3000; // Total number of images
+      var batchSize = 10; // Adjust the batch size
+
+      // Start loading images in batches
+      loadImagesInBatches(1, batchSize);
+
+    */
+    </script>
+  </body>
+</html>

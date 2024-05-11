@@ -1,0 +1,318 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #000;
+  overflow: hidden; /* Prevent scrollbars initially */
+}
+
+/* Container styles */
+.container {
+  display: flex;
+  margin: 0 auto;
+  min-height: 100vh; /* Ensure the container fills the viewport */
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+/* Sidebar styles */
+.sidebar {
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease-in-out; /* Add transition for smooth animation */
+}
+
+/* CSS specifically for the right sidebar's h2 */
+#right-sidebar h2 {
+  /* Your styles here */
+  margin-top: 10px;
+  text-align: center;
+  font-weight: lighter;
+}
+
+.sidebar h2 {
+  margin-top: 80px; /* Adjusted margin to move the title down */
+  font-size: 22px;
+  color: #fff;
+}
+
+.sidebar nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.sidebar nav ul li {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.sidebar nav ul li a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.sidebar nav ul li a:hover {
+  color: #fff;
+}
+
+.sidebar nav ul li::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #555;
+}
+
+.sidebar footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar footer a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s;
+  margin-bottom: 10px;
+}
+
+.sidebar footer a:hover {
+  color: #fff;
+}
+
+
+
+
+
+
+
+
+.content {
+  padding: 20px;
+  background-color: #000; /* Greyish-black background color */
+  color: white; /* Text color */
+  flex-grow: 1;
+  overflow-y: auto; /* Allow content scrolling */
+  display: flex; /* Ensure flex layout for content */
+  flex-direction: column; /* Column layout */
+}
+
+
+
+
+
+
+
+
+
+
+.content h1 {
+  margin-top: 0;
+}
+
+.images {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.images img {
+  width: 30%;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Updated Dropdown styles */
+.dropdown-content {
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  z-index: 1;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.3s ease;
+}
+
+.dropdown-content.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Button styles */
+.classify-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 320px;
+  background-color: #008CBA;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.classify-btn:hover {
+  background-color: #005f6b;
+}
+
+
+
+/* Button styles */
+.upload-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 440px;
+  background-color: #008CBA;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.upload-btn:hover {
+  background-color: #005f6b;
+}
+
+
+
+
+
+.button-container {
+  display: flex;
+}
+
+.dropbtn {
+  margin-right: 10px; /* Adjust spacing between buttons */
+}
+
+/* Hamburger menu styles */
+.hamburger-menu {
+  position: fixed; /* Fixed position */
+  top: 20px; /* Adjusted top position */
+  left: 11px; /* Adjusted left position */
+  color: white;
+  cursor: pointer;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+/* Sidebar styles */
+.left-sidebar {
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  width: 250px;
+  height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease-in-out; /* Add transition for smooth animation */
+}
+
+.left-sidebar.active {
+  transform: translateX(-250px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Right Sidebar Content styles */
+.right-sidebar {
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+/* Images container styles */
+.images-container {
+  max-height: 80vh; /* Limit the maximum height of the images container */
+  overflow-y: auto; /* Enable vertical scrolling for excess images */
+  scrollbar-width: thin; /* Specify the width of the scrollbar */
+  scrollbar-color: rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.2); /* Specify the color of the scrollbar */
+}
+
+/* Webkit scrollbar */
+.images-container::-webkit-scrollbar {
+  width: 10px; /* Set width for Chrome, Safari, and Opera */
+}
+
+/* Webkit scrollbar track */
+.images-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2); /* Set background color of the scrollbar track */
+}
+
+/* Webkit scrollbar thumb */
+.images-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5); /* Set color of the scrollbar thumb */
+  border-radius: 3px; /* Set border radius for the scrollbar thumb */
+}
+
+/* Webkit scrollbar corner */
+.images-container::-webkit-scrollbar-corner {
+  background: transparent; /* Set background color of the scrollbar corner */
+}
+
+
+
+
+.images-container img {
+  max-width: 100%; /* Ensure images resize proportionally */
+  height: auto; /* Allow images to maintain aspect ratio */
+  display: block; /* Prevent extra space below inline images */
+  margin-bottom: 10px; /* Add some spacing between images */
+}
+
+/* Button styles */
+.dropbtn {
+  margin-right: 10px; /* Adjust spacing between buttons */
+}
+
+
+
+/* Set fixed width and height for images */
+#selected-image img {
+  width: auto; /* Adjust the width as needed */
+  height: 600px; /* Adjust the height as needed */
+  object-fit: cover; /* Maintain aspect ratio and fill container */
+}
+
+
+#selected-image-container {
+  width: auto; /* Adjust the width as needed */
+  height: 500px; /* Adjust the height as needed */
+  object-fit: cover; /* Maintain aspect ratio and fill container */
+}
