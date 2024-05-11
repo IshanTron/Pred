@@ -166,32 +166,6 @@ import tensorflow as tf
 
 app = Flask(__name__, static_url_path="/static")
 
-
-
-
-
-
-
-
-import inspect
-
-if not hasattr(inspect, 'getargspec'):
-    inspect.getargspec = inspect.getfullargspec
-
-from invoke import task
-
-@task
-def say_hello(c):
-    print("Hello, World!")
-
-
-
-
-
-
-
-
-
 # Define the upload folder and allowed extensions
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
